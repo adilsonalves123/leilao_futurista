@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  Dimensions,
   Image,
   Pressable,
   StyleSheet,
@@ -13,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { AuctionSellerLine } from '@/components/seller/AuctionSellerLine';
 import { useCountdown } from '@/src/hooks/useCountdown';
+import { useWebLayout } from '@/src/hooks/useWebLayout';
 import {
   formatEngagementLabel,
   formatFeaturedPlusPrice,
@@ -21,10 +21,6 @@ import { lightColors } from '@/src/theme/lightTokens';
 import type { FeaturedPlusCarouselItem } from '@/src/types/featuredPlus';
 
 const BANNER_H_MARGIN = 8;
-const BANNER_ASPECT = 2;
-const SCREEN_W = Dimensions.get('window').width;
-const BANNER_WIDTH = SCREEN_W - BANNER_H_MARGIN * 2;
-const BANNER_HEIGHT = BANNER_WIDTH / BANNER_ASPECT;
 
 export type FeaturedCarouselProps = {
   items: FeaturedPlusCarouselItem[];
@@ -144,7 +140,17 @@ export function FeaturedCarousel({
   loading = false,
 }: FeaturedCarouselProps) {
   const router = useRouter();
+  const { isWideWeb, homeHeroWidth, homeHeroHeight } = useWebLayout();
   const [indiceAtivo, setIndiceAtivo] = useState(0);
+
+  const heroSize = useMemo(
+    () => ({
+      width: homeHeroWidth,
+      height: homeHeroHeight,
+      marginHorizontal: isWideWeb ? 28 : BANNER_H_MARGIN,
+    }),
+    [homeHeroHeight, homeHeroWidth, isWideWeb],
+  );
 
   useEffect(() => {
     setIndiceAtivo(0);
@@ -159,7 +165,19 @@ export function FeaturedCarousel({
   }, [items, items.length, autoplayIntervalMs]);
 
   if (loading) {
-    return <View style={[styles.hero, styles.heroPlaceholder]} />;
+    return (
+      <View
+        style={[
+          styles.hero,
+          styles.heroPlaceholder,
+          {
+            width: heroSize.width,
+            height: heroSize.height,
+            marginHorizontal: heroSize.marginHorizontal,
+          },
+        ]}
+      />
+    );
   }
 
   if (items.length === 0) {
@@ -175,7 +193,14 @@ export function FeaturedCarousel({
   return (
     <View style={styles.wrap}>
       <Pressable
-        style={styles.hero}
+        style={[
+          styles.hero,
+          {
+            width: heroSize.width,
+            height: heroSize.height,
+            marginHorizontal: heroSize.marginHorizontal,
+          },
+        ]}
         onPress={abrirLeilao}
         accessibilityRole="button"
         accessibilityLabel={`Destaque Plus: ${slide.title}`}>
@@ -213,10 +238,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   hero: {
-    width: BANNER_WIDTH,
-    height: BANNER_HEIGHT,
     alignSelf: 'center',
-    marginHorizontal: BANNER_H_MARGIN,
     borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#1A1625',

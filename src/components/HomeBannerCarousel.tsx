@@ -1,20 +1,27 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Dimensions, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useBanners } from '@/src/store/bannersContext';
+import { useWebLayout } from '@/src/hooks/useWebLayout';
 import { lightColors } from '@/src/theme/lightTokens';
 
-/** Banner retangular largo (2:1) — largura quase total da tela */
 const BANNER_H_MARGIN = 8;
-const BANNER_ASPECT = 2;
-const BANNER_WIDTH = Dimensions.get('window').width - BANNER_H_MARGIN * 2;
-const BANNER_HEIGHT = BANNER_WIDTH / BANNER_ASPECT;
 
 export function HomeBannerCarousel() {
   const router = useRouter();
+  const { isWideWeb, homeHeroWidth, homeHeroHeight } = useWebLayout();
   const { carrosselInicioAtivos, autoplayIntervalMs } = useBanners();
   const [indiceAtivo, setIndiceAtivo] = useState(0);
+
+  const heroSize = useMemo(
+    () => ({
+      width: homeHeroWidth,
+      height: homeHeroHeight,
+      marginHorizontal: isWideWeb ? 28 : BANNER_H_MARGIN,
+    }),
+    [homeHeroHeight, homeHeroWidth, isWideWeb],
+  );
 
   useEffect(() => {
     setIndiceAtivo(0);
@@ -41,7 +48,17 @@ export function HomeBannerCarousel() {
 
   return (
     <View style={styles.wrap}>
-      <Pressable style={styles.hero} onPress={abrirDestino} accessibilityRole="button">
+      <Pressable
+        style={[
+          styles.hero,
+          {
+            width: heroSize.width,
+            height: heroSize.height,
+            marginHorizontal: heroSize.marginHorizontal,
+          },
+        ]}
+        onPress={abrirDestino}
+        accessibilityRole="button">
         <Image source={{ uri: slide.image }} style={styles.heroImage} />
         <View style={styles.heroOverlayTop} />
         <View style={styles.heroOverlayBottom} />
@@ -94,10 +111,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   hero: {
-    width: BANNER_WIDTH,
-    height: BANNER_HEIGHT,
     alignSelf: 'center',
-    marginHorizontal: BANNER_H_MARGIN,
     borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#1A1625',

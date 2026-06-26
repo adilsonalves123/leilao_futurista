@@ -10,18 +10,35 @@ type Props = {
   children: ReactNode;
 };
 
+function isAuthPath(pathname: string) {
+  return (
+    pathname === '/' ||
+    pathname === '/welcome' ||
+    pathname.includes('/login') ||
+    pathname.includes('/register') ||
+    pathname.includes('/(auth)')
+  );
+}
+
 const outerWebStyle =
   Platform.OS === 'web'
     ? ({
         minHeight: '100vh',
         height: '100%',
+        width: '100%',
         backgroundColor: WEB_GRADIENT_BG,
         backgroundImage:
           'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.12) 0%, transparent 55%), linear-gradient(180deg, #EEF2FF 0%, #F8F9FD 50%, #F3F4F8 100%)',
+        boxSizing: 'border-box',
+      } as object)
+    : {};
+
+const outerWideWebStyle =
+  Platform.OS === 'web'
+    ? ({
         alignItems: 'center',
         paddingVertical: 16,
-        paddingHorizontal: 20,
-        boxSizing: 'border-box',
+        paddingHorizontal: 24,
       } as object)
     : {};
 
@@ -44,11 +61,19 @@ const frameNarrowWebStyle =
   Platform.OS === 'web'
     ? ({
         width: '100%',
-        maxWidth: WEB_LAYOUT.narrowMaxWidth,
         minHeight: '100vh',
         borderRadius: 0,
         overflow: 'hidden',
-        boxShadow: '0 0 0 1px rgba(124, 58, 237, 0.08)',
+        display: 'flex',
+        flexDirection: 'column',
+      } as object)
+    : {};
+
+const authFullBleedStyle =
+  Platform.OS === 'web'
+    ? ({
+        width: '100%',
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
       } as object)
@@ -63,8 +88,16 @@ export function UserWebChrome({ children }: Props) {
     return <>{children}</>;
   }
 
+  if (isAuthPath(pathname)) {
+    return (
+      <View style={[styles.outer, outerWebStyle, authFullBleedStyle]}>
+        {children}
+      </View>
+    );
+  }
+
   return (
-    <View style={[styles.outer, outerWebStyle]}>
+    <View style={[styles.outer, outerWebStyle, isWideWeb ? outerWideWebStyle : null]}>
       <View
         style={[
           styles.frame,
