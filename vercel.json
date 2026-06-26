@@ -1,0 +1,19 @@
+{
+  "buildCommand": "npm run build:web",
+  "outputDirectory": "dist",
+  "framework": null,
+  "rewrites": [
+    { "source": "/auction/:id", "destination": "/auction/[id].html" },
+    { "source": "/vendor/:id", "destination": "/vendor/[id].html" },
+    { "source": "/order/:id", "destination": "/order/[id].html" },
+    { "source": "/checkout/:id", "destination": "/checkout/[id].html" },
+    { "source": "/my-listings/:id", "destination": "/my-listings/[id].html" },
+    { "source": "/my-listings/edit/:id", "destination": "/my-listings/edit/[id].html" },
+    { "source": "/my-bids/chat/:orderId", "destination": "/my-bids/chat/[orderId].html" },
+    { "source": "/my-sales/chat/:orderId", "destination": "/my-sales/chat/[orderId].html" },
+    { "source": "/admin/pedidos/:id", "destination": "/admin/pedidos/[id].html" },
+    { "source": "/admin/disputas/:id", "destination": "/admin/disputas/[id].html" },
+    { "source": "/admin/vendedores/:id", "destination": "/admin/vendedores/[id].html" },
+    { "source": "/admin/arrematados/:id", "destination": "/admin/arrematados/[id].html" }
+  ]
+}
